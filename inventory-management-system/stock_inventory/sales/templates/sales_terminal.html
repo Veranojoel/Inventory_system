@@ -6,10 +6,10 @@
 
 {% block content %}
 <div class="sales_container">
-
     <!-- Sales Terminal -->
     <div class="products_table">
         <h2>SALES TERMINAL</h2>
+
         <table class="product-table">
             <thead>
                 <tr>
@@ -28,32 +28,38 @@
                     <td>{{ product.barcode }}</td>
                     <td>{{ product.description }}</td>
                     <td>{{ product.price }}</td>
+                    <td>{{ product.quantity }}</td>
                 </tr>
                 {% endfor %}
                 {% else %}
                 <tr id="noProductRow">
-                    <td colspan="4">No products selected</td>
+                    <td colspan="5">No products selected</td>
                 </tr>
                 {% endif %}
-            </tbody> 
+            </tbody>
         </table>
-         
+
+        <div class="total-container">
+            <h3>Total Price: {{ total_price }}</h3>
+        </div>
+
         <footer class="footer-btns">
-            <form method="post" action="{% url 'clear_sales_terminal' %}">
-                {% csrf_token %}
-                <button class="fbtn" id="cncl" type="submit">
-                    Cancel
-                </button>
-            </form>
-                           
-            <button class="fbtn" id="sbttl" type="button">Subtotal</button>
-            <button class="fbtn" id="totl" type="button">Total</button>
-            <p id="subtotalDisplay"></p>
+            <button class="fbtn" id="cncl" type="button" onclick="location.href='{% url 'clear_sales_terminal' %}'">Cancel</button>
+            <button class="fbtn" id="totl" type="button" onclick="location.href=' {% url 'process_total' %} '">Total</button>
         </footer>
     </div>
 
     <!-- Products Tab -->
     <div class="products-tab">
+        <div class="quantity-input">
+            <label for="quantityInput"><strong>Enter Quantity:</strong></label>
+            <form method="post" action="{% url 'add_to_sales_terminal' %}">
+                {% csrf_token %}
+                <input type="number" id="quantityInput" name="quantity" placeholder="Enter quantity" min="1" required>
+                <input type="hidden" id="productSelected" name="barcode">
+            </form>
+        </div>
+
         <div class="category_tab">
             <section class="filter-option">
                 <h2>PRODUCTS</h2>
@@ -69,25 +75,19 @@
                 </form>
             </section>
 
-                <table class="product-table">
-                    <tbody>
-                        {% for product in products %}
-                        <form method="post" action="{% url 'add_to_sales_terminal' %}">
-                            {% csrf_token %}
-                            <input type="hidden" name="product_name" value="{{ product.name }}">
-                            <input type="hidden" name="barcode" value="{{ product.barcode }}">
-                            <input type="hidden" name="description" value="{{ product.description }}">
-                            <input type="hidden" name="price" value="{{ product.price }}">
-                            <button type="submit" class="product-button">
-                                {{ product.name }}
-                            </button>
-                        </form>
-                        {% endfor %}
-                    </tbody>
-                </table>
+            <table class="product-table">
+                <tbody>
+                    {% for product in products %}
+                        <button type="button" class="product-button" onclick="selectProduct('{{ product.barcode}}')">
+                            {{ product.name }}
+                        </button>
+                    {% endfor %}
+                </tbody>
+            </table>
+
         </div>
+        
     </div>
 </div>
+
 {% endblock %}
-
-
